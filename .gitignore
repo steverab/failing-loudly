@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__
+.ipynb_checkpoints
+
+# IDEs
+.idea
+.vscode
+
+# Project
+paper_results
