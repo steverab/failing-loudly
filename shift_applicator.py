@@ -1,8 +1,15 @@
-import numpy as np
+# -------------------------------------------------
+# IMPORTS
+# -------------------------------------------------
+
 from data_utils import *
 
+# -------------------------------------------------
+# SHIFT APPLICATOR
+# -------------------------------------------------
 
-def apply_shift(X_te_orig, y_te_orig, shift):
+
+def apply_shift(X_te_orig, y_te_orig, shift, orig_dims, datset):
 	X_te_1 = None
 	y_te_1 = None
 	
