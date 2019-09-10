@@ -1,3 +1,7 @@
+# -------------------------------------------------
+# IMPORTS
+# -------------------------------------------------
+
 import numpy as np
 
 from sklearn.decomposition import PCA
@@ -11,11 +15,14 @@ from keras.callbacks import ReduceLROnPlateau, CSVLogger, EarlyStopping
 
 from keras import optimizers
 
-from enum import Enum
 from shared_utils import *
 import os
 
 import keras_resnet.models
+
+# -------------------------------------------------
+# SHIFT REDUCTOR
+# -------------------------------------------------
 
 
 class ShiftReductor:
@@ -30,6 +37,7 @@ class ShiftReductor:
         self.datset = datset
         self.mod_path = None
 
+        # We can set the number of dimensions automatically by computing PCA's variance retention rate.
         if dr_amount is None:
             pca = PCA(n_components=var_ret, svd_solver='full')
             pca.fit(X)
@@ -37,7 +45,11 @@ class ShiftReductor:
         else:
             self.dr_amount = dr_amount
 
+    # Since the autoencoder's and ResNet's training procedure can take some time, we usually only train them once
+    # and save the model for subsequent uses of dimensionality reduction. If we can't find a corresponding model in
+    # the usual directory, then we train the respective model on the fly. PCA and SRP are always trained on the fly.
     def fit_reductor(self):
+
         if self.dr_tech == DimensionalityReduction.PCA:
             return self.principal_components_anaylsis()
         elif self.dr_tech == DimensionalityReduction.SRP:
@@ -63,6 +75,8 @@ class ShiftReductor:
                 return load_model(self.mod_path, custom_objects=keras_resnet.custom_objects)
             return self.neural_network_classifier(train=True)
 
+    # Given a model to reduce dimensionality and some data, we have to perform different operations depending on
+    # the DR method used.
     def reduce(self, model, X):
         if self.dr_tech == DimensionalityReduction.PCA or self.dr_tech == DimensionalityReduction.SRP:
             return model.transform(X)
@@ -89,11 +103,14 @@ class ShiftReductor:
         pca.fit(self.X)
         return pca
 
+    # We construct a couple of different autoencoder architectures depending on the individual dataset. This is due to
+    # different input shapes. We usually share architectures if the shapes of two datasets match.
     def autoencoder(self, train=False):
         X = self.X.reshape(len(self.X), self.orig_dims[0], self.orig_dims[1], self.orig_dims[2])
 
         input_img = Input(shape=self.orig_dims)
 
+        # Define various architectures.
         if self.datset == 'mnist' or self.datset == 'fashion_mnist':
             x = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
             x = MaxPooling2D((2, 2), padding='same')(x)
@@ -109,7 +126,7 @@ class ShiftReductor:
             x = Conv2D(16, (3, 3), activation='relu')(x)
             x = UpSampling2D((2, 2))(x)
             decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
-        elif self.datset == 'cifar10' or self.datset == 'svhn':
+        elif self.datset == 'cifar10' or self.datset == 'cifar10_1' or self.datset == 'coil100' or self.datset == 'svhn':
 
             x = Conv2D(64, (3, 3), padding='same')(input_img)
             x = Activation('relu')(x)
@@ -145,7 +162,8 @@ class ShiftReductor:
             x = UpSampling2D((2, 2))(x)
             decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same')(x)
 
-
+        # Construct both an encoding model and a full encoding-decoding model. The first one will be used for mere
+        # dimensionality reduction, while the second one is needed for training.
         encoder = Model(input_img, encoded)
         autoenc = Model(input_img, decoded)
 
@@ -162,6 +180,7 @@ class ShiftReductor:
 
         return encoder
 
+    # Our label classifier constitutes of a simple ResNet-18.
     def neural_network_classifier(self, train=True):
         D = self.X.shape[1]
 
@@ -170,12 +189,12 @@ class ShiftReductor:
         batch_size = 128
         nb_classes = len(np.unique(self.y))
         epochs = 200
-        y_loc = np_utils.to_categorical(self.y, 10)
-        y_val_loc = np_utils.to_categorical(self.y_val, 10)
+        y_loc = np_utils.to_categorical(self.y, nb_classes)
+        y_val_loc = np_utils.to_categorical(self.y_val, nb_classes)
 
         model = keras_resnet.models.ResNet18(keras.layers.Input(self.orig_dims), classes=nb_classes)
         model.compile(loss='categorical_crossentropy',
-                      optimizer=optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9),
+                      optimizer=optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9),
                       metrics=['accuracy'])
 
         model.fit(self.X.reshape(len(self.X), self.orig_dims[0], self.orig_dims[1], self.orig_dims[2]), y_loc,
