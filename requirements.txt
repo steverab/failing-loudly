@@ -176,7 +176,7 @@ wcwidth==0.1.7
 webencodings==0.5.1
 WebOb==1.8.5
 WebTest==2.0.33
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 widgetsnbextension==3.4.2
 wrapt==1.11.1
 WSME==0.9.3
