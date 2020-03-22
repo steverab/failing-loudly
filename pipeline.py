@@ -112,7 +112,6 @@ colors = ['#2196f3', '#f44336', '#9c27b0', '#64dd17', '#009688', '#ff9800', '#79
 # -------------------------------------------------
 
 make_keras_picklable()
-np.set_printoptions(threshold=np.nan)
 
 datset = sys.argv[1]
 test_type = sys.argv[3]
