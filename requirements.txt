@@ -128,7 +128,7 @@ python-etcd==0.4.5
 python-keystoneclient==3.21.0
 python-mimeparse==1.6.0
 pytz==2018.9
-PyYAML==3.13
+PyYAML==5.1
 pyzmq==18.0.1
 qtconsole==4.4.4
 repoze.lru==0.7
