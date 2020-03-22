@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.random_projection import SparseRandomProjection
 
+import keras
 from keras.layers import Input, Dense, Dropout, Activation, Conv2D, MaxPooling2D, UpSampling2D
 from keras.models import Model, Sequential
 from keras.utils import np_utils
@@ -18,6 +19,7 @@ from keras import optimizers
 from shared_utils import *
 import os
 
+import keras_resnet
 import keras_resnet.models
 
 # -------------------------------------------------
@@ -177,13 +179,13 @@ class ShiftReductor:
                         shuffle=True)
                         
         encoder.save(self.mod_path)
-
+    
         return encoder
-
+    
     # Our label classifier constitutes of a simple ResNet-18.
     def neural_network_classifier(self, train=True):
         D = self.X.shape[1]
-
+    
         lr_reducer = ReduceLROnPlateau(factor=np.sqrt(0.1), cooldown=0, patience=5, min_lr=0.5e-6)
         early_stopper = EarlyStopping(min_delta=0.001, patience=10)
         batch_size = 128
@@ -191,12 +193,12 @@ class ShiftReductor:
         epochs = 200
         y_loc = np_utils.to_categorical(self.y, nb_classes)
         y_val_loc = np_utils.to_categorical(self.y_val, nb_classes)
-
+    
         model = keras_resnet.models.ResNet18(keras.layers.Input(self.orig_dims), classes=nb_classes)
         model.compile(loss='categorical_crossentropy',
                       optimizer=optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9),
                       metrics=['accuracy'])
-
+    
         model.fit(self.X.reshape(len(self.X), self.orig_dims[0], self.orig_dims[1], self.orig_dims[2]), y_loc,
                   batch_size=batch_size,
                   epochs=epochs,
@@ -205,5 +207,5 @@ class ShiftReductor:
                   callbacks=[lr_reducer, early_stopper])
                   
         model.save(self.mod_path)
-
+    
         return model

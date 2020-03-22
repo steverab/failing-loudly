@@ -83,7 +83,7 @@ class ShiftLocator:
 
     def build_model(self, X_tr, y_tr, X_te, y_te, balanced=True):
         if self.dc == DifferenceClassifier.FFNNDCL:
-            return self.neural_network_difference_detector(X_tr, y_tr, X_te, y_te, balanced=balanced)
+            return self.neural_network_difference_detector(X_tr, y_tr, X_te, y_te, bal=balanced)
         elif self.dc == DifferenceClassifier.FLDA:
             return self.fisher_lda_difference_detector(X_tr, X_te, balanced=balanced)
         elif self.ac == AnomalyDetection.OCSVM:

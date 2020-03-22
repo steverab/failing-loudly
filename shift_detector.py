@@ -25,6 +25,12 @@ class ShiftDetector:
         self.red_models = red_models
         self.sample = sample
         self.datset = datset
+        
+    def classify_data(self, X_tr, y_tr, X_val, y_val, X_te, y_te, orig_dims, nb_classes):
+        shift_reductor = ShiftReductor(X_tr, y_tr, X_val, y_val, DimensionalityReduction.BBSDh, orig_dims, self.datset, dr_amount=32)
+        shift_reductor_model = shift_reductor.fit_reductor()
+        X_te_red = shift_reductor.reduce(shift_reductor_model, X_te)
+        return X_te_red
 
     def detect_data_shift(self, X_tr, y_tr, X_val, y_val, X_te, y_te, orig_dims, nb_classes):
         od_decs = np.ones(len(self.dr_techniques)) * (-1)
