@@ -46,6 +46,21 @@ else:
 (_, _), (_, _), (X_te, y_te), orig_dims, _ = import_dataset(dataset, shuffle=True)
 X_te = normalize_datapoints(X_te, 255.)
 
+#external_dataset_path = './datasets/'
+#x_test = np.loadtxt(external_dataset_path + 'cifar10_X_adversarial.csv', delimiter=',')
+#y_test = np.loadtxt(external_dataset_path + 'cifar10_y_adversarial.csv', delimiter=',')
+#print(x_test.shape)
+#print(y_test.shape)
+#print('-----------------------------------')
+#np.save("%s/cifar10_X_adversarial.npy" % (external_dataset_path), x_test)
+#np.save("%s/cifar10_y_adversarial.npy" % (external_dataset_path), y_test)
+#x_test = np.load(external_dataset_path + 'cifar10_X_adversarial.npy')
+#y_test = np.load(external_dataset_path + 'cifar10_y_adversarial.npy')
+#print(x_test)
+#print(y_test)
+#exit(0)
+
+
 # Load the Keras model.
 model_path = './saved_models/' + dataset + '_standard_class_model.h5'
 model = load_model(model_path, custom_objects=keras_resnet.custom_objects)
@@ -97,5 +112,7 @@ for i in tqdm(range(len(X_te))):
             plt.savefig("%s/%s_%s_%s.pdf" % (path, i, y_te[i], pred), bbox_inches='tight', pad_inches=0)
 
 # Save results to datasets folder.
-np.savetxt("./datasets/%s_X_adversarial.csv" % dataset, X_te, delimiter=",")
-np.savetxt("./datasets/%s_y_adversarial.csv" % dataset, y_te, fmt='%5.0f', delimiter=",")
+#np.savetxt("./datasets/%s_X_adversarial.csv" % dataset, X_te, delimiter=",")
+#np.savetxt("./datasets/%s_y_adversarial.csv" % dataset, y_te, fmt='%5.0f', delimiter=",")
+np.save("./datasets/%s_X_adversarial.npy" % dataset, X_te)
+np.save("./datasets/%s_y_adversarial.npy" % dataset, y_te)
