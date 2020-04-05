@@ -365,15 +365,16 @@ for shift_idx, shift in enumerate(shifts):
                         print('-------------------')
                         print("Len of most conf: %s" % len(most_conf_test_indices))
                         print(y_te_old[most_conf_test_indices])
-                        y_te_dcl_pred = shift_detector.classify_data(X_tr_3, y_tr_3, X_val_3, y_val_3,
-                                                                     X_te_dcl[most_conf_test_indices],
-                                                                     y_te_dcl[most_conf_test_indices],
-                                                                     orig_dims, nb_classes)
-                        print(y_te_dcl_pred)
-                        dcl_class_acc = np.sum(np.equal(y_te_dcl_pred, y_te_old[most_conf_test_indices])
-                                               .astype(int))/len(y_te_dcl_pred)
-                        dcl_accs[si,rand_run] = dcl_class_acc
-                        print("dcl_class_acc: ", dcl_class_acc)
+                        if len(most_conf_test_indices) > 0:
+                            y_te_dcl_pred = shift_detector.classify_data(X_tr_3, y_tr_3, X_val_3, y_val_3,
+                                                                            X_te_dcl[most_conf_test_indices],
+                                                                            y_te_dcl[most_conf_test_indices],
+                                                                            orig_dims, nb_classes)
+                            print(y_te_dcl_pred)
+                            dcl_class_acc = np.sum(np.equal(y_te_dcl_pred, y_te_old[most_conf_test_indices])
+                                                    .astype(int))/len(y_te_dcl_pred)
+                            dcl_accs[si,rand_run] = dcl_class_acc
+                            print("dcl_class_acc: ", dcl_class_acc)
                         print('-------------------')
 
                     most_conf_samples = X_te_dcl[most_conf_test_indices]
