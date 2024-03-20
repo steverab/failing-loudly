@@ -3,10 +3,13 @@
 # -------------------------------------------------
 
 import numpy as np
-from tensorflow import set_random_seed
+import tensorflow as tf
+import builtins
+
 seed = 1
 np.random.seed(seed)
-set_random_seed(seed)
+tf.random.set_seed(seed)
+
 
 import keras
 import tempfile
@@ -125,9 +128,14 @@ if not os.path.exists(path):
     os.makedirs(path)
 
 # Define DR methods.
-dr_techniques = [DimensionalityReduction.NoRed.value, DimensionalityReduction.PCA.value, DimensionalityReduction.SRP.value, DimensionalityReduction.UAE.value, DimensionalityReduction.TAE.value, DimensionalityReduction.BBSDs.value, DimensionalityReduction.BBSDh.value]
+dr_techniques = [DimensionalityReduction.NoRed.value, DimensionalityReduction.PCA.value, DimensionalityReduction.SRP.value, DimensionalityReduction.UAE.value, DimensionalityReduction.TAE.value,
+                 # DimensionalityReduction.BBSDs.value,
+                 # DimensionalityReduction.BBSDh.value
+                 ]
 if test_type == 'multiv':
-    dr_techniques = [DimensionalityReduction.NoRed.value, DimensionalityReduction.PCA.value, DimensionalityReduction.SRP.value, DimensionalityReduction.UAE.value, DimensionalityReduction.TAE.value, DimensionalityReduction.BBSDs.value]
+    dr_techniques = [DimensionalityReduction.NoRed.value, DimensionalityReduction.PCA.value, DimensionalityReduction.SRP.value, DimensionalityReduction.UAE.value, DimensionalityReduction.TAE.value,
+                     # DimensionalityReduction.BBSDs.value
+                     ]
 if test_type == 'univ':
     dr_techniques_plot = dr_techniques.copy()
     dr_techniques_plot.append(DimensionalityReduction.Classif.value)
@@ -239,7 +247,7 @@ for shift_idx, shift in enumerate(shifts):
     dcl_accs = np.ones((len(samples), random_runs)) * (-1)
 
     # Average over a few random runs to quantify robustness.
-    for rand_run in range(random_runs):
+    for rand_run in builtins.range(5):
 
         print("Random run %s" % rand_run)
 
@@ -248,7 +256,8 @@ for shift_idx, shift in enumerate(shifts):
             os.makedirs(rand_run_path)
 
         np.random.seed(rand_run)
-        set_random_seed(rand_run)
+        tf.random.set_seed(rand_run)
+
 
         # Load data.
         (X_tr_orig, y_tr_orig), (X_val_orig, y_val_orig), (X_te_orig, y_te_orig), orig_dims, nb_classes = \
@@ -378,7 +387,7 @@ for shift_idx, shift in enumerate(shifts):
                         print('-------------------')
 
                     most_conf_samples = X_te_dcl[most_conf_test_indices]
-                    for j in range(len(most_conf_samples)):
+                    for j in builtins.range(len(most_conf_samples)):
                         if j < difference_samples:
                             samp = most_conf_samples[j,:]
                             fig = plt.imshow(samp.reshape(samp_shape), cmap=cmap)
@@ -427,7 +436,8 @@ for shift_idx, shift in enumerate(shifts):
         np.savetxt("%s/dr_method_p_vals.csv" % rand_run_path, rand_run_p_vals[:,:,rand_run], delimiter=",")
 
         np.random.seed(seed)
-        set_random_seed(seed)
+        tf.random.set_seed(seed)
+
 
     mean_p_vals = np.mean(rand_run_p_vals, axis=2)
     std_p_vals = np.std(rand_run_p_vals, axis=2)
@@ -445,7 +455,7 @@ for shift_idx, shift in enumerate(shifts):
             avg_val = 0
             elem_count = 0
             elem_list = []
-            for rand_run in range(random_runs):
+            for rand_run in builtins.range(random_runs):
                 current_val = dcl_accs[si, rand_run]
                 if current_val == -1:
                     continue
