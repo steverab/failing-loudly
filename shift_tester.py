@@ -1,6 +1,7 @@
 # -------------------------------------------------
 # IMPORTS
 # -------------------------------------------------
+import builtins
 
 import numpy as np
 import torch
@@ -41,11 +42,11 @@ class ShiftTester:
         unique_te, counts_te = np.unique(X_te, return_counts=True)
         total_counts_te = np.sum(counts_te)
 
-        for i in range(len(unique_tr)):
+        for i in builtins.range(len(unique_tr)):
             val = counts_tr[i]
             freq_exp[unique_tr[i]] = val
             
-        for i in range(len(unique_te)):
+        for i in builtins.range(len(unique_te)):
             freq_obs[unique_te[i]] = counts_te[i]
 
         if np.amin(freq_exp) == 0 or np.amin(freq_obs) == 0:
@@ -71,7 +72,7 @@ class ShiftTester:
         p_vals = []
 
         # For each dimension we conduct a separate KS test
-        for i in range(X_tr.shape[1]):
+        for i in builtins.range(X_tr.shape[1]):
             feature_tr = X_tr[:, i]
             feature_te = X_te[:, i]
 
@@ -89,7 +90,7 @@ class ShiftTester:
         # Apply the Bonferroni correction to bound the family-wise error rate. This can be done by picking the minimum
         # p-value from all individual tests.
         p_vals = np.array(p_vals)
-        p_val = min(np.min(p_vals), 1.0)
+        p_val = builtins.min(np.min(p_vals), 1.0)
 
         return p_val, p_vals
 
