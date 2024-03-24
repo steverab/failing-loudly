@@ -355,7 +355,7 @@ for shift_idx, shift in enumerate(shifts):
 
                     rev_top_test_ind = test_indices[::-1][:difference_samples]
                     least_conf_samples = X_te_dcl[rev_top_test_ind]
-                    for j in range(len(rev_top_test_ind)):
+                    for j in builtins.range(len(rev_top_test_ind)):
                         samp = least_conf_samples[j, :]
                         fig = plt.imshow(samp.reshape(samp_shape), cmap=cmap)
                         plt.axis('off')
@@ -435,7 +435,8 @@ for shift_idx, shift in enumerate(shifts):
 
         np.savetxt("%s/dr_method_p_vals.csv" % rand_run_path, rand_run_p_vals[:,:,rand_run], delimiter=",")
 
-        np.random.seed(seed)
+        print("seed value:  ", seed, type(seed))
+        np.random.seed(0)
         tf.random.set_seed(seed)
 
 
